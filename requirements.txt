@@ -5,3 +5,4 @@ python-dotenv
 langchain-huggingface
 pypdf
 python-docx
+python-multipart
