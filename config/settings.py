@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 HF_TOKEN = os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACEHUB_API_TOKEN")
+
+# FRONTEND_URL = os.getenv("FRONTEND_URL", "*")
 if not HF_TOKEN:
     logger.warning("HF_TOKEN is not set! Check your .env file.")
 

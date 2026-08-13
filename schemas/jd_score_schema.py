@@ -6,10 +6,12 @@ Defines strict Pydantic schemas for JD Scoring API.
 from typing import List
 from pydantic import BaseModel, Field
 
-class JDScoreRequest(BaseModel):
-    """Request payload schema for Single JD scoring endpoint."""
-    resume_data: dict = Field(..., description="Parsed resume JSON data")
-    job_description: str = Field(..., description="Target job description text")
+# only for 1 resume.
+
+# class JDScoreRequest(BaseModel):
+#     """Request payload schema for Single JD scoring endpoint."""
+#     resume_data: dict = Field(..., description="Parsed resume JSON data")
+#     job_description: str = Field(..., description="Target job description text")
 
 class JDScoreResponseSchema(BaseModel):
     """Schema representing the JD evaluation response."""

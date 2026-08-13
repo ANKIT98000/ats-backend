@@ -10,22 +10,34 @@ from typing import Optional, Dict, Any
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, status, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 
-# --- Purane Imports ---
-from schemas.jd_score_schema import JDScoreRequest
-from services.jd_score_service import execute_jd_score_pipeline
+# this 2 import for one resume jd_score
+# from schemas.jd_score_schema import JDScoreRequest
+# from services.jd_score_service import execute_jd_score_pipeline
+
+
+
 from utils.parse_extractor import extract_text_for_parsing
 from services.parse_service import execute_parse_pipeline
 
-# --- NAYA BULK IMPORT ---
+
 from services.bulk_service import BULK_DB, process_candidates_one_by_one
+
+from schemas.interview_schema import InterviewQuestionRequest
+from services.interview_service import generate_interview_questions
+
+from config.settings import FRONTEND_URL
 
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Resume Parse & Bulk JD Score API", version="4.0.0")
+app = FastAPI(title="Resume Parse & Bulk JD Score API", version="1.0.0")
 
 app.add_middleware(
-    CORSMiddleware, allow_origins=["*"], allow_credentials=True, 
-    allow_methods=["*"], allow_headers=["*"]
+    CORSMiddleware,
+    allow_origins=["*"],
+    # allow_origins=[FRONTEND_URL],
+    allow_credentials=True, 
+    allow_methods=["*"],
+    allow_headers=["*"]
 )
 
 @app.get("/health", status_code=status.HTTP_200_OK)
@@ -70,31 +82,31 @@ async def parse_resume_endpoint(
 # ==========================================
 # API 2: JD SCORE ENDPOINT
 # ==========================================
-@app.post("/api/v1/score-resume", status_code=status.HTTP_200_OK)
-async def score_resume_endpoint(request: JDScoreRequest):
-    print("\n" + "="*50)
-    print(f"🌐 [API HIT] POST /api/v1/score-resume")
-    print("="*50)
+# @app.post("/api/v1/score-resume", status_code=status.HTTP_200_OK)
+# async def score_resume_endpoint(request: JDScoreRequest):
+#     print("\n" + "="*50)
+#     print(f"🌐 [API HIT] POST /api/v1/score-resume")
+#     print("="*50)
     
-    try:
-        evaluation = execute_jd_score_pipeline(
-            resume_data=request.resume_data,
-            job_description=request.job_description
-        )
+#     try:
+#         evaluation = execute_jd_score_pipeline(
+#             resume_data=request.resume_data,
+#             job_description=request.job_description
+#         )
         
-        final_response = {"success": True, "evaluation": evaluation}
+#         final_response = {"success": True, "evaluation": evaluation}
         
-        # 🚀 JD Score ka response bhi print karwa diya
-        print("\n📤 [RESPONSE] Sending this JD Score JSON Data to Frontend:")
-        print(json.dumps(final_response, indent=4))
-        print("="*50 + "\n")
+#         # 🚀 JD Score ka response bhi print karwa diya
+#         print("\n📤 [RESPONSE] Sending this JD Score JSON Data to Frontend:")
+#         print(json.dumps(final_response, indent=4))
+#         print("="*50 + "\n")
         
-        return final_response
+#         return final_response
 
-    except Exception as exc:
-        print(f"❌ [ERROR] JD Score API Failed: {str(exc)}")
-        logger.error(f"Endpoint /score-resume failed: {str(exc)}")
-        raise HTTPException(status_code=500, detail="Internal JD Score Error.")
+#     except Exception as exc:
+#         print(f"❌ [ERROR] JD Score API Failed: {str(exc)}")
+#         logger.error(f"Endpoint /score-resume failed: {str(exc)}")
+#         raise HTTPException(status_code=500, detail="Internal JD Score Error.")
 
 
 
@@ -147,3 +159,30 @@ async def get_bulk_results(batch_id: str):
     
     # Return the live status!
     return BULK_DB[batch_id]
+
+
+
+# ==========================================
+# NAYI API 5: GENERATE INTERVIEW QUESTIONS
+# ==========================================
+@app.post("/api/v1/generate-questions", status_code=status.HTTP_200_OK)
+async def generate_questions_endpoint(request: InterviewQuestionRequest):
+    print("\n" + "="*50)
+    print(f"🌐 [API HIT] POST /api/v1/generate-questions")
+    print("="*50)
+    
+    try:
+        # Call the new service
+        final_response = generate_interview_questions(request)
+        
+        # Print output in terminal for debugging
+        print("\n📤 [RESPONSE] Sending Interview Questions to Frontend:")
+        print(json.dumps(final_response, indent=4)[:500] + "\n... (truncated for terminal) ...")
+        print("="*50 + "\n")
+        
+        return final_response
+
+    except Exception as exc:
+        print(f"❌ [ERROR] Interview Questions API Failed: {str(exc)}")
+        logger.error(f"Endpoint /generate-questions failed: {str(exc)}")
+        raise HTTPException(status_code=500, detail=str(exc))

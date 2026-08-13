@@ -20,12 +20,13 @@ def calculate_months_from_string(duration_str: str) -> int:
     return 0
 
 def format_experience_string(months: int) -> str:
-    if months <= 0: return "Fresher"
-    years = months // 12
-    rem_months = months % 12
-    if years == 0: return f"{rem_months} mos full time"
-    elif rem_months == 0: return f"{years} yrs full time"
-    else: return f"{years} yrs {rem_months} mos full time"
+    if months <= 0: 
+        return "Fresher"
+    
+    # Mahino ko 12 se divide karke 1 decimal point tak round off kar diya (e.g., 14 / 12 = 1.16 -> 1.2)
+    decimal_years = round(months / 12, 1)
+    
+    return f"{decimal_years} years"
 
 def process_parse_experience(raw_data: Dict[str, Any]) -> Dict[str, Any]:
     work_history = raw_data.get("work_history", [])
