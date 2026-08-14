@@ -45,5 +45,5 @@ class RawParsedDataSchema(BaseModel):
     phone: Optional[str] = Field("", description="Phone or mobile number")
     skills: List[str] = Field(default_factory=list)
     work_history: List[WorkHistoryItemSchema] = Field(default_factory=list)
-    atsscore: Optional[str] = Field("75%", description="General ATS readiness score")
+    atsscore: str = Field(...,description="Strict ATS score (e.g. '45%', '85%'). If the text is NOT a valid resume, strictly return '0%'.")
     extraDetails: ExtraDetailsSchema = Field(default_factory=ExtraDetailsSchema)

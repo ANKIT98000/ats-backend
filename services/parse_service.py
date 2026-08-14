@@ -21,7 +21,17 @@ def execute_parse_pipeline(resume_text: str, resume_id: Optional[str] = None) ->
     try:
         print("⏳ [AI MODEL] Sending text to Qwen LLM. Please wait...")
         raw_parsed = chain.invoke({"resume_text": truncated_text})
-        
+        # Pydantic object ko dictionary me convert kiya
+        raw_data = raw_parsed.model_dump()
+        # 🛡️ THE TRAP DOOR: Check if AI flagged it as a fake/garbage document
+        ats_score_str = str(raw_data.get("atsscore", "")).strip()
+        if ats_score_str == "0%" or ats_score_str == "0":
+            print("🚨 [SERVICE ALERT] Garbage Document Detected! Rejecting...")
+            return {
+                "resumeId": resume_id or str(uuid.uuid4()),
+                "status": "FALSE",
+                "message": "Resume was not proper. Please upload a valid document."
+            }
         print("🧠 [AI MODEL] Data extracted! Passing to Python Math Engine...")
         accurate_parsed_data = process_parse_experience(raw_parsed.model_dump())
         

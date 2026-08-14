@@ -20,7 +20,8 @@ from utils.parse_extractor import extract_text_for_parsing
 from services.parse_service import execute_parse_pipeline
 
 
-from services.bulk_service import BULK_DB, process_candidates_one_by_one
+from services.jd_bulk_manager_service import BULK_DB, process_candidates_one_by_one
+from schemas.jd_score_schema import BulkJDScoreRequest
 
 from schemas.interview_schema import InterviewQuestionRequest
 from services.interview_service import generate_interview_questions
@@ -117,7 +118,7 @@ async def parse_resume_endpoint(
 # NAYI API 3: START BULK JOB 
 # ==========================================
 @app.post("/api/v1/jd-bulk-score/start")
-async def start_bulk_score(payload: Dict[str, Any], background_tasks: BackgroundTasks):
+async def start_bulk_score(payload: BulkJDScoreRequest, background_tasks: BackgroundTasks):
     """Frontend is API par apna 100+ candidates wala JSON bhejega."""
     print("\n" + "="*50)
     print(f"🚀 [API HIT] POST /api/v1/jd-bulk-score/start")
@@ -126,14 +127,15 @@ async def start_bulk_score(payload: Dict[str, Any], background_tasks: Background
     
     # Database initialization
     BULK_DB[batch_id] = {
-        "total": 0,          # Background task update karega
+        "total": len(payload.applications),  # 🔥 Pydantic ka fayda! Seedha array ki length yahan mil gayi
         "processed": 0,
         "is_completed": False,
         "results": []
     }
 
-    # Background processing chalu kar di!
-    background_tasks.add_task(process_candidates_one_by_one, batch_id, payload)
+    # Background processing chalu kar di! 
+    # (payload.model_dump() isliye lagaya taaki service ko wapas Dictionary format mile)
+    background_tasks.add_task(process_candidates_one_by_one, batch_id, payload.model_dump())
 
     response = {
         "success": True,
