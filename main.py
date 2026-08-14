@@ -25,7 +25,7 @@ from services.bulk_service import BULK_DB, process_candidates_one_by_one
 from schemas.interview_schema import InterviewQuestionRequest
 from services.interview_service import generate_interview_questions
 
-from config.settings import FRONTEND_URL
+# from config.settings import FRONTEND_URL
 
 logger = logging.getLogger(__name__)
 
