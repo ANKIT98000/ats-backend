@@ -14,14 +14,19 @@ logger = logging.getLogger(__name__)
 def generate_interview_questions(request_data: InterviewQuestionRequest) -> dict:
     print("🎯 [SERVICE] Initiating Interview Question Generation Pipeline...")
     
-    # 1. Filter out blank or invalid stages
+    # 1. Filter out blank or inactive stages (toggleButton = False)
     valid_stages = []
     for stage in request_data.interview_stages:
-        if stage.stageName and stage.stageName.strip() != "":
-            valid_stages.append({"stageName": stage.stageName.strip(), "sequence": stage.sequence})
+        # Check if name is valid AND toggleButton is True
+        if stage.stageName and stage.stageName.strip() != "" and stage.toggleButton is True:
+            valid_stages.append({
+                "stageName": stage.stageName.strip(), 
+                "sequence": stage.sequence,
+                "stageDescription": stage.stageDescription # Description AI ko bhejenge
+            })
             
     if not valid_stages:
-        raise ValueError("No valid interview stages provided.")
+        raise ValueError("No active interview stages provided. Please enable at least one stage.")
 
     print(f"✅ [SERVICE] Valid Stages Found: {[s['stageName'] for s in valid_stages]}")
 

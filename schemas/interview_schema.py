@@ -14,6 +14,8 @@ class JobDetails(BaseModel):
 class InterviewStage(BaseModel):
     stageName: str
     sequence: int
+    stageDescription: Optional[str] = Field(default="", description="Instructions for this specific round")
+    toggleButton: bool = Field(default=True, description="If false, this stage is skipped")
 
 class HiringCriteria(BaseModel):
     criteriaName: str
