@@ -11,7 +11,7 @@ import docx
 logger = logging.getLogger(__name__)
 
 def extract_text_for_parsing(filename: str, content: bytes) -> str:
-    print(f"🔍 [EXTRACTOR] Opening and reading file: {filename}...")
+    print(f" [EXTRACTOR] Opening and reading file: {filename}...")
     filename_lower = filename.lower()
     text_content = []
 
@@ -31,9 +31,9 @@ def extract_text_for_parsing(filename: str, content: bytes) -> str:
             raise ValueError("Unsupported file format.")
 
         full_text = "\n".join(text_content).strip()
-        print(f"✂️  [EXTRACTOR] Successfully extracted {len(full_text)} characters.")
+        print(f"[EXTRACTOR] Successfully extracted {len(full_text)} characters.")
         return full_text
     except Exception as exc:
-        print(f"❌ [EXTRACTOR ERROR] Failed to read text: {str(exc)}")
+        print(f"[EXTRACTOR ERROR] Failed to read text: {str(exc)}")
         logger.error(f"Error extracting text: {str(exc)}")
         raise

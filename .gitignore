@@ -11,3 +11,5 @@ env/
 
 # Ignore ALL Markdown files (README.md etc.)
 *.md
+# Temporary Folders & Resumes
+temp_resumes_data/
